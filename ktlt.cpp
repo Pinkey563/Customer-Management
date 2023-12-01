@@ -21,14 +21,14 @@ class Customer {
 void create_customer(Customer& customer) {
 	cout << "----------Customer Information----------" << endl;
 	cout << "ID: ";
-	cin >> cus.ID;
+	cin >> customer.ID;
 	fflush(stdin);
 	cout << "Name: ";
-	getline(cin,cus.name);
+	getline(cin,customer.name);
 	cout << "Telephone number: ";
-	getline(cin,cus.tel);
+	getline(cin,customer.tel);
 	cout << "Date of birth: ";
-	getline(cin,cus.dob);
+	getline(cin,customer.dob);
 	fflush(stdin);
 }
 
@@ -36,8 +36,8 @@ void show_customer(const Customer& customer) {
 	cout << setfill(' ');
 	cout << setw(15) << left << customer.ID;
 	cout << setw(30) << left << customer.name;
-	cout << setw(20) << left << customers.tel;
-	cout << setw(20) << left << customers.dob;
+	cout << setw(20) << left << customer.tel;
+	cout << setw(20) << left << customer.dob;
 	cout << setw(15) << left << customer.pts;
 	cout << setw(5) << left << customer.rank;
 	cout << setw(15) << left << customer.totalbuy;
@@ -52,7 +52,7 @@ void list_customers(const vector<Customer>& customers) {
 void add_customer(vector<Customer>& customers) {
 	Customer newCustomer;
 	create_customer(newCustomer);
-	list.push_back(newCustomer);	
+	customers.push_back(newCustomer);	
 }
 
 void delete_customer(vector<Customer>& customers, int customerID) {
