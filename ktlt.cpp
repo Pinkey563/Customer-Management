@@ -17,6 +17,35 @@ class Customer {
 		long int pts;
 		string rank;
 		double totalbuy;
+		// Ham cap nhat diem va rank dua vao tong tien da chi tieu
+		void update_rank_and_pts() {
+			pts = static_cast<int>(totalbuy) / 1000;
+			if (pts < 1000) {
+				rank = "None";
+			} 
+			else if (pts < 2000) {
+				rank = "Bronze";
+			} 
+			else if (pts < 3000) {
+				rank = "Silver";
+			} 
+			else if (pts < 4000) {
+				rank = "Gold";
+			} 
+			else if (pts < 5000) {
+				rank = "Platinum";
+			} 
+			else if (pts < 10000) {
+				rank = "Diamond";
+			} 
+			else if (pts >= 10000) {
+				rank = "VIP";
+			}
+			else {
+				cout << "Invalid purchase";	
+			}
+			return;
+		}
 };
 // Ham khoi tao khach hang moi
 void create_customer(Customer& customer) {
@@ -30,16 +59,18 @@ void create_customer(Customer& customer) {
 	getline(cin,customer.tel);
 	cout << "Date of birth (dd/mm/yyyy): ";
 	getline(cin,customer.dob);
+	customer.totalbuy = 0.0;
+	customer.update_rank_and_pts();
 }
 // Ham hien thi thong tin cua tung khach hang
 void show_customer(const Customer& customer) {
 	cout << setfill(' ');
-	cout << setw(15) << left << customer.ID;
+	cout << setw(5) << left << customer.ID;
 	cout << setw(30) << left << customer.name;
 	cout << setw(20) << left << customer.tel;
 	cout << setw(20) << left << customer.dob;
-	cout << setw(15) << left << customer.pts;
-	cout << setw(5) << left << customer.rank;
+	cout << setw(10) << left << customer.pts;
+	cout << setw(20) << left << customer.rank;
 	cout << setw(15) << left << customer.totalbuy;
 }
 // Ham tao ra 1 list hien thi thong tin khach hang
@@ -57,43 +88,48 @@ void add_customer(vector<Customer>& customers) {
 // Ham xoa khach hang
 void delete_customer(vector<Customer>& customers) {
 	cout << "Delete customers by [1]: ID, [2]: Name, [3]: Telephone number, [4]: Date of birth " << endl;
-	int choicedel;
-	if (choicedel == 1) {
+	int choice;
+	cin >> choice;
+	if (choice == 1) {
+		cin.ignore();
 		int customerID;
 		cout << "Delete customer by ID: ";
 		cin >> customerID;
 		customers.erase(remove_if(customers.begin(), customers.end(),
-                                   [customerID](const Customer& customer) { return customer.ID == customerID; }),
-                        customers.end());
+							[customerID](const Customer& customer) {return customer.ID == customerID; }),
+				customers.end());
 		cout << "DONE !!!" <<endl;
-	}
-	else if (choicedel == 2) {
+	} 
+	else if (choice == 2) {
+		cin.ignore();
 		string customername;
 		cout << "Delete customer by name: ";
 		getline(cin, customername);
 		customers.erase(remove_if(customers.begin(), customers.end(),
-                                   [customername](const Customer& customer) { return customer.name == customername; }),
-                        customers.end());
+							[customername](const Customer& customer) {return customer.name == customername; }),
+				customers.end());
 		cout << "DONE !!!" <<endl;
-	}
-	else if (choicedel == 3) {
+	} 
+	else if (choice == 3) {
+		cin.ignore();
 		string customertel;
 		cout << "Delete customer by telephone number: ";
 		getline(cin, customertel);
 		customers.erase(remove_if(customers.begin(), customers.end(),
-                                   [customertel](const Customer& customer) { return customer.tel == customertel; }),
-                        customers.end());
+							[customertel](const Customer& customer) {return customer.tel == customertel; }),
+				customers.end());
 		cout << "DONE !!!" <<endl;
-	}
-	else if (choicedel == 4) {
+	} 
+	else if (choice == 4) {
+		cin.ignore();
 		string customerdob;
 		cout << "Delete customer by date of birth: ";
 		getline(cin, customerdob);
 		customers.erase(remove_if(customers.begin(), customers.end(),
-                                   [customerdob](const Customer& customer) { return customer.dob == customerdob; }),
-                        customers.end());
+							[customerdob](const Customer& customer) {return customer.dob == customerdob; }),
+				customers.end());
 		cout << "DONE !!!" <<endl;
-	}
+	} 
 	else {
 		cout << "Invalid choice " << endl;
 	}
@@ -251,10 +287,31 @@ vector<Customer> search_totalbuy(const vector<Customer>& customers) {
 }
 // Ham tong hop cac loai tim kiem
 void search_all(const vector<Customer>& customers) {
-	cout << "Search for customers by [1]: ID, [2]: Name, [3]: Telephone number, [4]: Date of birth, [5]: Points, [6]: Rank, [7]: Total buy" << endl;
+	cout << "Search by [1]: ID, [2]: Name, [3]: Telephone number, [4]: Date of birth, [5]: Points, [6]: Rank, [7]: Total buy" << endl;
 	int choice;
 	cin >> choice;
-	
+	cin.ignore();
+	if (choice == 1) {
+		search_ID(customers);
+	}
+	else if (choice == 2) {
+		search_name(customers);
+	}
+	else if (choice == 3) {
+		search_tel(customers);
+	}
+	else if (choice == 4) {
+		search_dob(customers);
+	}
+	else if (choice == 5) {
+		search_pts(customers);
+	}
+	else if (choice == 6) {
+		search_rank(customers);
+	}
+	else if (choice == 7) {
+		search_totalbuy(customers);
+	}
 }
 // Ham thay doi thong tin khach hang
 void change_info_customer(vector<Customer>& customers) {
@@ -262,24 +319,26 @@ void change_info_customer(vector<Customer>& customers) {
 	cout << "----------Change Customer Information---------- "<< endl;
 	cout << "Changing informaton for customer with ID: ";
 	cin >> customerID;
-	cin.ignore();
 	for (auto& customer : customers) {
 		if (customer.ID == customerID) {
 			int choice;
-			cout << "What do you want to change? [1]: Name, [2]:Telephone number, [3]: Date of birth)" << endl;
+			cout << "What do you want to change? [1]: Name, [2]:Telephone number, [3]: Date of birth, [4]: Total buy)" << endl;
 			cin >> choice;
-			cin.ignore();
 			if(choice == 1) {
 				cout << "New name: ";
 				getline(cin, customer.name);
-			}
-			else if(choice == 2) {
+			} else if(choice == 2) {
 				cout << "New telephone number: ";
 				getline(cin, customer.tel);
-			}
-			else if(choice == 3) {
+			} else if(choice == 3) {
 				cout << "New date of birth: ";
 				getline(cin, customer.dob);
+			} else if(choice == 4) {
+				double newpurchase;
+				cout << "New purchase: ";
+				cin >> newpurchase;
+				customer.totalbuy += newpurchase;
+				customer.update_rank_and_pts();
 			}
 			cout << "Information for customer with ID " << customerID << " has been changed." << endl;
 			return;
@@ -287,37 +346,75 @@ void change_info_customer(vector<Customer>& customers) {
 	}
 	cout << "Customer with ID " << customerID << " does not exist." << endl;
 }
-
-	int main() {
+// Ham dinh dang thong tin trong file
+void inputFile(const vector<Customer> & customers) {
+	ofstream output("Customer.txt");
+	if (output.is_open()) {
+		for (const auto & customer : customers) {
+			output << customer.ID << endl;
+			output << customer.name << endl;
+			output << customer.tel << endl;
+			output << customer.dob << endl;
+		}
+		cout << "Customers'information has been saved to the file." << endl;
+	} else {
+		cout << "File is unable to be used." << endl;
+	}
+	output.close();
+}
+// Ham doc du lieu tu trong file
+void readFile(vector<Customer>& customers) {
+    ifstream input("Customer.txt");
+    if (input.is_open()) {
+        while (!input.eof()) {
+            Customer customer;
+            input >> customer.ID;
+            input.ignore(); 
+            getline(input, customer.name);
+            getline(input, customer.tel);
+            getline(input, customer.dob);
+            customers.push_back(customer);
+        }
+        cout << "Customers' information has been loaded!" << endl;
+    } else {
+        cout << "Failed to load customers' information!" << endl;
+    }
+    input.close();
+}
+int main() {
 	vector<Customer> customers;
+	readFile(customers);
+	cout << fixed;
+	cout << setprecision(0);
+	cout << "---------- Main menu ----------" << endl;
+	cout << "[1]: Show the list of customers " << endl;
+	cout << "[2]: Add a new customer " << endl;
+	cout << "[3]: Delete a customer " << endl;
+	cout << "[4]: Search for customers by categories " << endl;
+	cout << "[5]: Change customer's information " << endl;
+	cout << "[6]: Exit " << endl;
 	while(1) {
 		cout << "-------------------------------------" << endl;
 		cout << "Your choice: ";
-		int choice; 
+		int choice;
 		cin >> choice;
-		switch (choice) {	
-			case 2:
+		switch (choice) {
+			case 1:
 				list_customers(customers);
 				break;
-			case 3:
+			case 2:
 				add_customer(customers);
 				break;
-			case 4:
+			case 3:
 				delete_customer(customers);
 				break;
-			case 5:
-				search_ID(customers);
+			case 4:
+				search_all(customers);
 				break;
-			case 6:
+			case 5:
 				change_info_customer(customers);
 				break;
-			case 7:
-				cout << "Help yourself." << endl;
-				break;
-			case 8:
-				cout << "About" << endl;
-				break;
-			case 0:
+			case 6:
 				return 0;
 			default:
 				cout << "Invalid choice." << endl;
@@ -325,5 +422,6 @@ void change_info_customer(vector<Customer>& customers) {
 	}
 	return 0;
 }
+
 
 
