@@ -1,10 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <iomanip>		// for std::setw(n), std::setfill(ch), std::left, std::right
-#include <string>		// for stoi
+#include <iomanip>		// for std::setw(n), std::setfill(ch), std::left
+#include <string>		
 #include <fstream>		// open, write to file
-#include <sstream>
 #include <limits>
 using namespace std;
 // Tao class Customer chua thong tin khach hang
@@ -46,7 +45,75 @@ class Customer {
 			}
 			return;
 		}
+		// Ham ghi thong tin tai khoan vao file
+    	void saveToCustomerFile(ofstream& output) const {
+        output << ID << endl;
+        output << name << endl;
+        output << tel << endl;
+        output << dob << endl;
+		output << pts << endl;
+        output << rank << endl;
+        output << totalbuy << endl;
+    	}
 };
+// Tao class Account chua ten dang nhap va mat khau
+class Account {
+public:
+    string username;
+    string password;
+    Account() : username(""), password("") {}
+    Account(const string& username, const string& password) : username(username), password(password) {
+    }
+	// Ham kiem tra dang nhap
+    bool login(const string& inputUsername, const string& inputPassword) const {
+        return (inputUsername == username && inputPassword == password);
+    }
+    // Ham ghi thong tin tai khoan vao file
+    void saveToAccountFile(ofstream& file) const {
+        file << username << endl;
+        file << password << endl;
+    }
+};
+// Ham dang ky tai khoan
+void registerAccount(vector<Account>& accounts) {
+    string newUsername;
+	string newPassword;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "Enter new username: ";
+    getline(cin, newUsername);
+    cout << "Enter new password: ";
+    getline(cin, newPassword);
+    // Kiem tra xem tai khoan da duoc tao chua
+    for (const auto& account : accounts) {
+        if (account.username == newUsername) {
+            cout << "Username already exists. Try again." << endl;
+            return;
+        }
+    }
+    // Them tai khoan moi vao danh sach
+    accounts.emplace_back(newUsername, newPassword);
+    cout << "Sign up successful." << endl;
+}
+// Ham dang nhap
+bool loginAccount(const vector<Account>& accounts) {
+    string inputUsername;
+	string inputPassword;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "Enter username: ";
+    getline(cin, inputUsername);
+    cout << "Enter password: ";
+    getline(cin, inputPassword);
+    // Kiem tra tung tai khoan
+    for (const auto& account : accounts) {
+        if (account.login(inputUsername, inputPassword)) {
+            cout << "Login successful." << endl;
+            return true;
+        }
+    }
+    // Neu tai khoan do chua duoc dang ki
+    cout << "Login failed. Invalid username or password." << endl;
+    return false;
+}
 // Ham khoi tao khach hang moi
 void create_customer(Customer& customer) {
 	cout << "----------Customer Information----------" << endl;
@@ -346,82 +413,138 @@ void change_info_customer(vector<Customer>& customers) {
 	}
 	cout << "Customer with ID " << customerID << " does not exist." << endl;
 }
-// Ham dinh dang thong tin trong file
-void inputFile(const vector<Customer> & customers) {
-	ofstream output("Customer.txt");
-	if (output.is_open()) {
-		for (const auto & customer : customers) {
-			output << customer.ID << endl;
-			output << customer.name << endl;
-			output << customer.tel << endl;
-			output << customer.dob << endl;
-		}
-		cout << "Customers'information has been saved to the file." << endl;
-	} else {
-		cout << "File is unable to be used." << endl;
-	}
-	output.close();
+// Ham ghi danh sach tai khoan vao file
+void saveAccountToFile(const vector<Account>& accounts) {
+    ofstream file("Account.txt");
+    if (file.is_open()) {
+        for (const auto& account : accounts) {
+            account.saveToAccountFile(file);
+        }
+        cout << "Accounts have been saved to file." << endl;
+    } else {
+        cout << "Failed to open file for writing." << endl;
+    }
+    file.close();
 }
-// Ham doc du lieu tu trong file
-void readFile(vector<Customer>& customers) {
+
+void readAccountFile(vector<Account>& accounts) {
+    ifstream file("Accounts.txt");
+    if (file.is_open()) {
+        string username, password;
+        while (file >> username >> password) {
+            accounts.emplace_back(username, password);
+        }
+        cout << "Accounts have been loaded." << std::endl;
+    } else {
+        cout << "Failed to open file for reading." << std::endl;
+    }
+    file.close();
+}
+// Ham dinh dang thong tin trong file
+void customerFile(const vector<Customer>& customers) {
+    ofstream output("Customer.txt");
+    if (output.is_open()) {
+        for (const auto& customer : customers) {
+            customer.saveToCustomerFile(output);
+        }
+        cout << "Customers' information has been saved to the file." << endl;
+    } else {
+        cout << "File is unable to be used." << endl;
+    }
+    output.close();
+}
+
+void readCustomerFile(vector<Customer>& customers) {
     ifstream input("Customer.txt");
     if (input.is_open()) {
-        while (!input.eof()) {
-            Customer customer;
-            input >> customer.ID;
-            input.ignore(); 
-            getline(input, customer.name);
-            getline(input, customer.tel);
-            getline(input, customer.dob);
+    	Customer customer;
+        while (input >> customer.ID >> customer.name >> customer.tel >> customer.dob) {
             customers.push_back(customer);
         }
         cout << "Customers' information has been loaded!" << endl;
-    } else {
+    } 
+	else {
         cout << "Failed to load customers' information!" << endl;
     }
     input.close();
 }
 int main() {
 	vector<Customer> customers;
-	readFile(customers);
+	vector<Account> accounts;
+ 	readCustomerFile(customers);
+ 	customerFile(customers);
+ 	readAccountFile(accounts);
+ 	saveAccountToFile(accounts);
 	cout << fixed;
 	cout << setprecision(0);
-	cout << "---------- Main menu ----------" << endl;
-	cout << "[1]: Show the list of customers " << endl;
-	cout << "[2]: Add a new customer " << endl;
-	cout << "[3]: Delete a customer " << endl;
-	cout << "[4]: Search for customers by categories " << endl;
-	cout << "[5]: Change customer's information " << endl;
-	cout << "[6]: Exit " << endl;
-	while(1) {
-		cout << "-------------------------------------" << endl;
-		cout << "Your choice: ";
-		int choice;
-		cin >> choice;
-		switch (choice) {
-			case 1:
-				list_customers(customers);
-				break;
-			case 2:
-				add_customer(customers);
-				break;
-			case 3:
-				delete_customer(customers);
-				break;
-			case 4:
-				search_all(customers);
-				break;
-			case 5:
-				change_info_customer(customers);
-				break;
-			case 6:
-				return 0;
-			default:
-				cout << "Invalid choice." << endl;
-		}
-	}
-	return 0;
+    bool exitProgram = false;
+    while (!exitProgram) {
+        cout << "Welcome to the customer management system" << endl;
+        cout << "Please select your option: " << endl;
+        cout << "[1]: Login" << endl;
+        cout << "[2]: Sign up" << endl;
+        cout << "[3]: Exit" << endl;
+        bool login = false;
+        while (!login) {
+            cout << "-------------------------------------" << endl;
+            cout << "Your choice: ";
+            int choice;
+            cin >> choice;
+            switch (choice) {
+                case 1:
+                    login = loginAccount(accounts);
+                    if (login) {
+                        cout << "--------------- Main menu ---------------" << endl;
+                        cout << "[1]: Show the list of customers " << endl;
+                        cout << "[2]: Add a new customer " << endl;
+                        cout << "[3]: Delete a customer " << endl;
+                        cout << "[4]: Search for customers by categories " << endl;
+                        cout << "[5]: Change customer's information " << endl;
+                        cout << "[6]: Exit " << endl;
+                    }
+                    break;
+                case 2:
+                    registerAccount(accounts);
+                    break;
+                case 3:
+                    cout << "Exiting the program." << endl;
+                    return 0;
+                default:
+                    cout << "Invalid choice." << endl;
+            }
+        }
+            while (1) {
+                cout << "-------------------------------------" << endl;
+                cout << "Your choice: ";
+                int choice;
+                cin >> choice;
+                switch (choice) {
+                    case 1:
+                        list_customers(customers);
+                        break;
+                    case 2:
+                        add_customer(customers);
+                        break;
+                    case 3:
+                        delete_customer(customers);
+                        break;
+                    case 4:
+                        search_all(customers);
+                        break;
+                    case 5:
+                        change_info_customer(customers);
+                        break;
+                    case 6:
+                        break;
+                    default:
+                        cout << "Invalid choice." << endl;
+                }
+                if (choice == 6) {
+                    break;
+                }
+            }
+    }
+    return 0;
 }
-
 
 
