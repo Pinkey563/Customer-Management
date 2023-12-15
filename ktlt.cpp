@@ -51,7 +51,7 @@ class Customer {
         output << name << endl;
         output << tel << endl;
         output << dob << endl;
-		output << pts << endl;
+	output << pts << endl;
         output << rank << endl;
         output << totalbuy << endl;
     	}
@@ -77,8 +77,8 @@ public:
 // Ham dang ky tai khoan
 void registerAccount(vector<Account>& accounts) {
     string newUsername;
-	string newPassword;
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    string newPassword;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Enter new username: ";
     getline(cin, newUsername);
     cout << "Enter new password: ";
@@ -97,8 +97,8 @@ void registerAccount(vector<Account>& accounts) {
 // Ham dang nhap
 bool loginAccount(const vector<Account>& accounts) {
     string inputUsername;
-	string inputPassword;
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    string inputPassword;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Enter username: ";
     getline(cin, inputUsername);
     cout << "Enter password: ";
