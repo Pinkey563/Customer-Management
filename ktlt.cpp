@@ -456,11 +456,9 @@ vector<Customer> sort_All (const vector<Customer>& customers) {
 			cin >> sortChoice;
 			if (sortChoice == 1) {
 				sort_Day (customers);
-			}
-			else if (sortChoice == 2) {
+			} else if (sortChoice == 2) {
 				sort_Month (customers);
-			}
-			else if (sortChoice == 3) {
+			} else if (sortChoice == 3) {
 				sort_Year (customers);
 			}
 			break;
@@ -759,7 +757,7 @@ void saveStaffAccountToFile(vector<Account>& accounts) {
 	output.close();
 }
 // Ham doc tai khoan Customer trong file
-void readCustomerAccountFile(vector<Account>& accounts) {
+vector<Account> readCustomerAccountFile(vector<Account>& accounts) {
 	ifstream input("CustomerAccount.txt");
 	if (input.is_open()) {
 		string username;
@@ -771,7 +769,7 @@ void readCustomerAccountFile(vector<Account>& accounts) {
 	input.close();
 }
 // Ham doc tai khoan Staff trong file
-void readStaffAccountFile(vector<Account>& accounts) {
+vector<Account> readStaffAccountFile(vector<Account>& accounts) {
 	ifstream input("StaffAccount.txt");
 	if (input.is_open()) {
 		string username;
@@ -783,7 +781,7 @@ void readStaffAccountFile(vector<Account>& accounts) {
 	input.close();
 }
 // Ham doc tai khoan Manager trong file
-void readManagerAccountFile(vector<Account>& accounts) {
+vector<Account> readManagerAccountFile(vector<Account>& accounts) {
 	ifstream input("ManagerAccount.txt");
 	if (input.is_open()) {
 		string username;
@@ -829,9 +827,9 @@ int main() {
 	vector<Customer> customers;
 	vector<Account> accounts;
 	readCustomerFile(customers);
-	readCustomerAccountFile(accounts);
-	readStaffAccountFile(accounts);
-	readManagerAccountFile(accounts);
+	vector<Account> customerAccounts = readCustomerAccountFile(accounts);
+	vector<Account> staffAccounts = readStaffAccountFile(accounts);
+	vector<Account> managerAccounts = readManagerAccountFile(accounts);
 	printSeal();
 	cout << fixed;
 	cout << setprecision(0);
@@ -877,146 +875,152 @@ int main() {
 			cin >> choice;
 			switch (choice) {
 				case 1:
+					login = loginAccount(accounts);
 					while (!login && loginAttempts < 3) {
-					if(loginAccount(accounts)){
 						if (userChoice == 1) {
-							cout << "\n--------------- Main menu for customer ---------------" << endl;
-							cout << "[1]: Show customer's information " << endl;
-							cout << "[2]: Print temporary card " << endl;
-							cout << "[0]: Exit " << endl;
+							if (loginAccount(customerAccounts)) {
+								cout << "\n--------------- Main menu for customer ---------------" << endl;
+								cout << "[1]: Show customer's information " << endl;
+								cout << "[2]: Print temporary card " << endl;
+								cout << "[0]: Exit " << endl;
+								login = true;
+							} else {
+								loginAttempts++;
+							}
 						}
 						if (userChoice == 2) {
-							cout << "\n--------------- Main menu for staff ---------------" << endl;
-							cout << "[1]: Show the list of customers " << endl;
-							cout << "[2]: Add a new customer " << endl;
-							cout << "[3]: Delete a customer " << endl;
-							cout << "[4]: Delete the list " << endl;
-							cout << "[5]: Change customer's information " << endl;
-							cout << "[6]: Search for customers by categories " << endl;
-							cout << "[7]: Sort customers by categories " << endl;
-							cout << "[8]: Register customer account" << endl;
-							cout << "[9]: Delete customer account" << endl;
-							cout << "[0]: Exit " << endl;
+							if (loginAccount(staffAccounts)) {
+								cout << "\n--------------- Main menu for staff ---------------" << endl;
+								cout << "[1]: Show the list of customers " << endl;
+								cout << "[2]: Add a new customer " << endl;
+								cout << "[3]: Delete a customer " << endl;
+								cout << "[4]: Delete the list " << endl;
+								cout << "[5]: Change customer's information " << endl;
+								cout << "[6]: Search for customers by categories " << endl;
+								cout << "[7]: Sort customers by categories " << endl;
+								cout << "[8]: Register customer account" << endl;
+								cout << "[9]: Delete customer account" << endl;
+								cout << "[0]: Exit " << endl;
+								login = true;
+							} else {
+								loginAttempts++;
+							}
 						}
 						if (userChoice == 3) {
-							cout << "\n--------------- Main menu for manager ---------------" << endl;
-							cout << "[1]: Register staff account" << endl;
-							cout << "[2]: Delete staff account" << endl;
-							cout << "[0]: Exit" << endl;
-						}
-						login = true;
-					}
-					else {
-                        loginAttempts++;
-                    }
-                                    		if (loginAttempts >= 3) {
-            cout << "Too many login attempts. Exiting." << endl;
-            exitUserType = true;
-        }
-                }
+							if (loginAccount(managerAccounts)) {
+								cout << "\n--------------- Main menu for manager ---------------" << endl;
+								cout << "[1]: Register staff account" << endl;
+								cout << "[2]: Delete staff account" << endl;
+								cout << "[0]: Exit" << endl;
 
-						break;
+								login = true;
+							} else {
+								loginAttempts++;
+							}
+						}
+						if (loginAttempts >= 3) {
+							cout << "Too many login attempts. Exiting." << endl;
+							exitUserType = true;
+						}
+					}
+					break;
 				case 0:
 					exitUserType = true;
 					break;
 				default:
 					cout << "Invalid choice." << endl;
 					break;
-			
-		}
-
-		
-			if (login) {
-				while (1) {
-					cout << "-------------------------------------" << endl;
-					cout << "Your choice (main menu): ";
-					int choice;
-					cin >> choice;
-					if (userChoice == 1) {
-						switch (choice) {
-							case 1:
-								check (customers, accounts);
+					if (login) {
+						while (1) {
+							cout << "-------------------------------------" << endl;
+							cout << "Your choice (main menu): ";
+							int choice;
+							cin >> choice;
+							if (userChoice == 1) {
+								switch (choice) {
+									case 1:
+										check (customers, accounts);
+										break;
+									case 2:
+										tempCard (customers, accounts);
+										break;
+									case 0:
+										break;
+									default:
+										cout << "Invalid choice" << endl;
+										break;
+								}
+							}
+							if  (userChoice == 2) {
+								switch (choice) {
+									case 1:
+										list_customers(customers);
+										break;
+									case 2:
+										add_customer(customers);
+										saveCustomerToFile(customers);
+										break;
+									case 3:
+										delete_customer(customers);
+										saveCustomerToFile(customers);
+										break;
+									case 4:
+										delete_list(customers);
+										saveCustomerToFile(customers);
+										break;
+									case 5:
+										change_info_customer(customers);
+										saveCustomerToFile(customers);
+										break;
+									case 6:
+										search_all(customers);
+										break;
+									case 7:
+										sort_All(customers);
+										break;
+									case 8:
+										registerAccount(accounts);
+										saveCustomerAccountToFile(accounts);
+										break;
+									case 9:
+										deleteAccount(accounts);
+										saveCustomerAccountToFile(accounts);
+									case 0:
+										saveCustomerToFile(customers);
+										break;
+									default:
+										cout << "Invalid choice" << endl;
+										break;
+								}
+							}
+							if (userChoice == 3) {
+								switch (choice) {
+									case 1:
+										registerAccount(accounts);
+										saveStaffAccountToFile(accounts);
+										break;
+									case 2:
+										deleteAccount(accounts);
+										saveStaffAccountToFile(accounts);
+										break;
+									case 0:
+										break;
+									default:
+										cout << "Invalid choice" << endl;
+										break;
+								}
+							}
+							if (choice == 0) {
 								break;
-							case 2:
-								tempCard (customers, accounts);
-								break;
-							case 0:
-								break;
-							default:
-								cout << "Invalid choice" << endl;
-								break;
+							}
 						}
 					}
-					if  (userChoice == 2) {
-						switch (choice) {
-							case 1:
-								list_customers(customers);
-								break;
-							case 2:
-								add_customer(customers);
-								saveCustomerToFile(customers);
-								break;
-							case 3:
-								delete_customer(customers);
-								saveCustomerToFile(customers);
-								break;
-							case 4:
-								delete_list(customers);
-								saveCustomerToFile(customers);
-								break;
-							case 5:
-								change_info_customer(customers);
-								saveCustomerToFile(customers);
-								break;
-							case 6:
-								search_all(customers);
-								break;
-							case 7:
-								sort_All(customers);
-								break;
-							case 8:
-								registerAccount(accounts);
-								saveCustomerAccountToFile(accounts);
-								break;
-							case 9:
-								deleteAccount(accounts);
-								saveCustomerAccountToFile(accounts);
-							case 0:
-								saveCustomerToFile(customers);
-								break;
-							default:
-								cout << "Invalid choice" << endl;
-								break;
-						}
-					}
-					if (userChoice == 3) {
-						switch (choice) {
-							case 1:
-								registerAccount(accounts);
-								saveStaffAccountToFile(accounts);
-								break;
-							case 2:
-								deleteAccount(accounts);
-								saveStaffAccountToFile(accounts);
-								break;
-							case 0:
-								break;
-							default:
-								cout << "Invalid choice" << endl;
-								break;
-						}
-					}
-					if (choice == 0) {
+					if (exitUserType) {
 						break;
 					}
-				}
-			}
-			if (exitUserType) {
-				break;
 			}
 		}
 	}
 	return 0;
 }
-
 
