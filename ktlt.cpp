@@ -67,8 +67,8 @@ class Account {
 			output << password << endl;
 		}
 };
-// Ham dang ky tai khoan
-void registerAccount(vector<Account>& accounts) {
+// Ham dang ky tai khoan khach hang
+void registerCusAccount(vector<Account>& customerAccounts) {
 	string newUsername;
 	string newPassword;
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -77,40 +77,56 @@ void registerAccount(vector<Account>& accounts) {
 	cout << "Enter new password (Tel): ";
 	getline(cin, newPassword);
 	// Kiem tra xem tai khoan da duoc tao chua
-	for (const auto& account : accounts) {
+	for (const auto& account : customerAccounts) {
 		if (account.username == newUsername) {
 			cout << "Username already exists. Try again." << endl;
 			return;
 		}
 	}
 	// Them tai khoan moi vao danh sach
-	accounts.emplace_back(newUsername, newPassword);
+	customerAccounts.emplace_back(newUsername, newPassword);
 	cout << "Sign up successful." << endl;
 }
-// Ham xoa tai khoan
-void deleteAccount(vector<Account>& accounts) {
-	string deleteUsername;
-	cout << "\nEnter delete username (ID): ";
-	getline(cin, deleteUsername);
-	// Xoa tai khoan khoi danh sach
-	accounts.erase(remove_if(accounts.begin(), accounts.end(),
-	[deleteUsername](const Account& account) {
-		return account.username == deleteUsername;
-	}),
-	accounts.end());;
-	// Kiem tra xem tai khoan da duoc xoa chua
-	bool deleted = true;
-	for (const auto& account : accounts) {
-		if (account.username == deleteUsername) {
-			deleted = false;
+// Ham dang ky tai khoan nhan vien
+void registerStaffAccount(vector<Account>& staffAccounts) {
+	string newUsername;
+	string newPassword;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	cout << "\nEnter new username (ID): ";
+	getline(cin, newUsername);
+	cout << "Enter new password (Tel): ";
+	getline(cin, newPassword);
+	// Kiem tra xem tai khoan da duoc tao chua
+	for (const auto& account : staffAccounts) {
+		if (account.username == newUsername) {
+			cout << "Username already exists. Try again." << endl;
+			return;
 		}
 	}
-	if (deleted = true) {
-		cout << "Account has been deleted successfully!! " << endl;
-	}
+	// Them tai khoan moi vao danh sach
+	staffAccounts.emplace_back(newUsername, newPassword);
+	cout << "Sign up successful." << endl;
 }
-// Ham dang nhap
-bool loginAccount(const vector<Account>& accounts) {
+// Ham hien thi tai khoan khach hang
+void showCustomerAccounts(const vector<Account>& customerAccounts) {
+	cout << "===================================" << endl;
+	cout << "List of Accounts:" << endl;
+	for (const auto& account : customerAccounts) {
+		cout << "Username: " << account.username << "\tPassword: " << account.password << endl;
+	}
+	cout << "===================================" << endl;
+}
+// Ham hien thi tai khoan nhan vien
+void showStaffAccounts(const vector<Account>& staffAccounts) {
+	cout << "===================================" << endl;
+	cout << "List of Accounts:" << endl;
+	for (const auto& account : staffAccounts) {
+		cout << "Username: " << account.username << "\tPassword: " << account.password << endl;
+	}
+	cout << "===================================" << endl;
+}
+// Ham dang nhap khach hang
+bool loginCusAccount(const vector<Account>& customerAccounts, int& currentCustomerIndex) {
 	string inputUsername;
 	string inputPassword;
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -119,9 +135,50 @@ bool loginAccount(const vector<Account>& accounts) {
 	cout << "Enter password (Tel): ";
 	getline(cin, inputPassword);
 	// Kiem tra tung tai khoan
-	for (const auto& account : accounts) {
+	for (size_t i = 0; i < customerAccounts.size(); i++) {
+		if (customerAccounts[i].login(inputUsername, inputPassword)) {
+			cout << "Login successfully." << endl;
+			currentCustomerIndex = i;
+			return true;
+		}
+	}
+// Neu tai khoan do chua duoc dang ki
+	cout << "Login failed. Invalid username or password." << endl;
+	return false;
+}
+// Ham dang nhap nhan vien
+bool loginStaffAccount(const vector<Account>& staffAccounts) {
+	string inputUsername;
+	string inputPassword;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	cout << "Enter username (ID): ";
+	getline(cin, inputUsername);
+	cout << "Enter password (Tel): ";
+	getline(cin, inputPassword);
+	// Kiem tra tung tai khoan
+	for (const auto& account : staffAccounts) {
 		if (account.login(inputUsername, inputPassword)) {
-			cout << "Login successful." << endl;
+			cout << "Login successfully." << endl;
+			return true;
+		}
+	}
+	// Neu tai khoan do chua duoc dang ki
+	cout << "Login failed. Invalid username or password." << endl;
+	return false;
+}
+// Ham dang nhap quan li
+bool loginManagerAccount(const vector<Account>& managerAccounts) {
+	string inputUsername;
+	string inputPassword;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	cout << "Enter username (ID): ";
+	getline(cin, inputUsername);
+	cout << "Enter password (Tel): ";
+	getline(cin, inputPassword);
+	// Kiem tra tung tai khoan
+	for (const auto& account : managerAccounts) {
+		if (account.login(inputUsername, inputPassword)) {
+			cout << "Login successfully." << endl;
 			return true;
 		}
 	}
@@ -132,9 +189,9 @@ bool loginAccount(const vector<Account>& accounts) {
 // Ham khoi tao khach hang moi
 void create_customer(Customer& customer) {
 	cout << "----------Customer Information----------" << endl;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	cout << "ID: ";
 	getline(cin, customer.ID);
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	cout << "Name: ";
 	getline(cin, customer.name);
 	cout << "Telephone number: ";
@@ -229,22 +286,39 @@ void delete_customer(vector<Customer>& customers) {
 	}
 	return;
 }
-void delete_list(vector<Customer>& customers) {
-	cout << "Do you want to delete the whole list?" << endl;
-	cout << "[1]: Yes\n[2]: No" << endl;
-	int choice;
-	cout << "Your choice (delete list): ";
-	cin >> choice;
-	switch (choice) {
-		case 1:
-			customers.clear();
-			cout << "DONE !!!";
+// Ham thay doi thong tin tai khoan khach hang
+void changeAccount(vector<Account>& customerAccounts) {
+	bool found = false;
+	string targetUsername;
+	string changeUsername;
+	string changePassword;
+	cout << "Enter username of the account you want to modify: ";
+	cin >> targetUsername;
+	for (int i = 0; i < customerAccounts.size(); i++) {
+		if(customerAccounts[i].username == targetUsername) {
+			found = true;
+			cout << "Old username: " << customerAccounts[i].username << endl;
+			cout << "Old password: " << customerAccounts[i].password << endl;
+			cout << "=========================" << endl;
+			cout << "New username: ";
+			cin >> changeUsername;
+			cout << "New password: ";
+			cin >> changePassword;
+			customerAccounts[i].username = changeUsername;
+			customerAccounts[i].password = changePassword;
+			cout << "You have change successfully!!" << endl;
+			ofstream output("CustomerAccount.txt");
+			if (output.is_open()) {
+				for (const auto& account : customerAccounts) {
+					account.saveToAccountFile(output);
+				}
+			}
+			output.close();
 			break;
-		case 2:
-			break;
-		default:
-			cout << "Invalid choice!!!" << endl;
-			break;
+		}
+	}
+	if (!found) {
+		cout << "No account has that username" << endl;
 	}
 }
 // Ham sap xep thong tin khach hang theo ID
@@ -445,9 +519,10 @@ vector<Customer> sort_All (const vector<Customer>& customers) {
 	int choice;
 	cout << "Your choice (sort type): ";
 	cin >> choice;
+	cin.ignore();
 	switch (choice) {
 		case 1:
-			sort_ID (customers);
+			return sort_ID (customers);
 			break;
 		case 2:
 			cout << "Sort by [1]: Day, [2]: Month, [3]: Year" << endl;
@@ -455,18 +530,18 @@ vector<Customer> sort_All (const vector<Customer>& customers) {
 			cout << "Your choice (DOB sort type): ";
 			cin >> sortChoice;
 			if (sortChoice == 1) {
-				sort_Day (customers);
+				return sort_Day (customers);
 			} else if (sortChoice == 2) {
-				sort_Month (customers);
+				return sort_Month (customers);
 			} else if (sortChoice == 3) {
-				sort_Year (customers);
+				return sort_Year (customers);
 			}
 			break;
 		case 3:
-			sort_Pts (customers);
+			return sort_Pts (customers);
 			break;
 		case 4:
-			sort_TotalBuy (customers);
+			return sort_TotalBuy (customers);
 			break;
 		default:
 			cout << "Invalid choice" << endl;
@@ -569,17 +644,17 @@ vector<Customer> search_pts(const vector<Customer>& customers) {
 	cout << "Search for point: ";
 	cin >> customerpts;
 	for(const auto& customer : customers) {
-		if (customer.pts > customerpts) {
+		if (customer.pts >= customerpts) {
 			list.push_back(customer);
 		}
 	}
 	if (list.size() == 0) {
-		cout << "There is no customer has more points than: " << customerpts << endl;
+		cout << "There is no customer has points more than or equal to: " << customerpts << endl;
 		return customers;
 	} else if (list.size() == 1) {
-		cout << "There is 1 customer has more points than: " << customerpts << endl;
+		cout << "There is 1 customer has points more than or equal to: " << customerpts << endl;
 	} else {
-		cout << "There are " << list.size() << " customers have more points than " << customerpts << endl;
+		cout << "There are " << list.size() << " customers have points more than or equal to" << customerpts << endl;
 	}
 	list_customers(list);
 	return list;
@@ -615,17 +690,17 @@ vector<Customer> search_totalbuy(const vector<Customer>& customers) {
 	cout << "Search for total buy: ";
 	cin >> customertotalbuy;
 	for(const auto& customer : customers) {
-		if (customer.totalbuy > customertotalbuy) {
+		if (customer.totalbuy >= customertotalbuy) {
 			list.push_back(customer);
 		}
 	}
 	if (list.size() == 0) {
-		cout << "There is not customer has bought more than: " << customertotalbuy << endl;
+		cout << "There is not customer has bought more than or equal to: " << customertotalbuy << endl;
 		return customers;
 	} else if (list.size() == 1) {
-		cout << "There is 1 customer has bought more than: " << customertotalbuy << endl;
+		cout << "There is 1 customer has bought more than or equal to: " << customertotalbuy << endl;
 	} else {
-		cout << "There are " << list.size() << " customers have bought more than: " << customertotalbuy << endl;
+		cout << "There are " << list.size() << " customers have bought more than or equal to: " << customertotalbuy << endl;
 	}
 	list_customers(list);
 	return list;
@@ -636,7 +711,7 @@ void search_all(const vector<Customer>& customers) {
 	int choice;
 	cout << "Your choice (search type): ";
 	cin >> choice;
-	cin.ignore();
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	if (choice == 1) {
 		search_ID(customers);
 	} else if (choice == 2) {
@@ -658,12 +733,14 @@ void change_info_customer(vector<Customer>& customers) {
 	string customerID;
 	cout << "----------Change Customer Information---------- "<< endl;
 	cout << "Changing informaton for customer with ID: ";
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	getline(cin, customerID);
 	for (auto& customer : customers) {
 		if (customer.ID == customerID) {
 			int choice;
 			cout << "What do you want to change? [1]: Name, [2]:Telephone number, [3]: Date of birth, [4]: Total buy)" << endl;
 			cin >> choice;
+			cin.ignore();
 			if(choice == 1) {
 				cout << "New name: ";
 				getline(cin, customer.name);
@@ -687,24 +764,30 @@ void change_info_customer(vector<Customer>& customers) {
 	cout << "Customer with ID " << customerID << " does not exist." << endl;
 }
 // Ham kiem tra khach hang va in thong tin khach hang do
-void check(const vector<Customer>& customers, const vector<Account>& accounts) {
+void check(const vector<Customer>& customers, const vector<Account>& customerAccounts, int& currentCustomerIndex) {
 	bool found = false;
+	string loginUsername;
+	string loginPassword;
+	for (int i =0; i < customerAccounts.size(); i++) {
+		if (i == currentCustomerIndex) {
+			loginUsername = customerAccounts[i].username;
+			loginPassword = customerAccounts[i].password;
+		}
+	}
 	for(const auto&customer : customers) {
-		for (const auto&account : accounts) {
-			if (account.username == customer.ID && account.password == customer.tel) {
-				cout << "Here is your information, " << customer.name << " !!!" << endl;
-				cout << setfill(' ');
-				cout << setw(5) << left << "ID";
-				cout << setw(20) << left << "Name";
-				cout << setw(20) << left << "Telephone";
-				cout << setw(20) << left << "Date of Birth";
-				cout << setw(15) << left << "Points";
-				cout << setw(20) << left << "Rank";
-				cout << setw(20) << left << "Total Buy" << endl;
-				show_customer(customer);
-				found = true;
-				break;
-			}
+		if (loginUsername == customer.ID && loginPassword == customer.tel) {
+			cout << "Here is your information, " << customer.name << " !!!" << endl;
+			cout << setfill(' ');
+			cout << setw(5) << left << "ID";
+			cout << setw(20) << left << "Name";
+			cout << setw(20) << left << "Telephone";
+			cout << setw(20) << left << "Date of Birth";
+			cout << setw(15) << left << "Points";
+			cout << setw(20) << left << "Rank";
+			cout << setw(20) << left << "Total Buy" << endl;
+			show_customer(customer);
+			found = true;
+			break;
 		}
 	}
 	if (!found) {
@@ -712,11 +795,19 @@ void check(const vector<Customer>& customers, const vector<Account>& accounts) {
 	}
 }
 // Ham in the thanh vien tam thoi
-void tempCard (const vector<Customer>& customers, const vector<Account>& accounts) {
+void tempCard (const vector<Customer>& customers, const vector<Account>& customerAccounts, int& currentCustomerIndex) {
 	bool found = false;
+	string loginUsername;
+	string loginPassword;
+	for (int i =0; i < customerAccounts.size(); i++) {
+		if (i == currentCustomerIndex) {
+			loginUsername = customerAccounts[i].username;
+			loginPassword = customerAccounts[i].password;
+		}
+	}
 	for(const auto&customer : customers) {
-		for (const auto&account : accounts) {
-			if (account.username == customer.ID && account.password == customer.tel) {
+		for (int i =0; i < customerAccounts.size(); i++) {
+			if (loginUsername == customer.ID && loginPassword == customer.tel) {
 				cout << "=================================================" << endl;
 				cout << "||           Customer's Information            ||" << endl;
 				cout << "|| ID: " << setw(40) << left << customer.ID << "||" << endl;
@@ -737,57 +828,57 @@ void tempCard (const vector<Customer>& customers, const vector<Account>& account
 	}
 }
 // Ham ghi danh sach tai khoan Customer vao file
-void saveCustomerAccountToFile(vector<Account>& accounts) {
+void saveCustomerAccountToFile(vector<Account>& customerAccounts) {
 	ofstream output("CustomerAccount.txt");
 	if (output.is_open()) {
-		for (const auto& account : accounts) {
+		for (const auto& account : customerAccounts) {
 			account.saveToAccountFile(output);
 		}
 	}
 	output.close();
 }
 // Ham ghi danh sach tai khoan Staff vao file
-void saveStaffAccountToFile(vector<Account>& accounts) {
+void saveStaffAccountToFile(vector<Account>& staffAccounts) {
 	ofstream output("StaffAccount.txt");
 	if (output.is_open()) {
-		for (const auto& account : accounts) {
+		for (const auto& account : staffAccounts) {
 			account.saveToAccountFile(output);
 		}
 	}
 	output.close();
 }
 // Ham doc tai khoan Customer trong file
-vector<Account> readCustomerAccountFile(vector<Account>& accounts) {
+void readCustomerAccountFile(vector<Account>& customerAccounts) {
 	ifstream input("CustomerAccount.txt");
 	if (input.is_open()) {
 		string username;
 		string password;
 		while (input >> username >> password) {
-			accounts.emplace_back(username, password);
+			customerAccounts.emplace_back(username, password);
 		}
 	}
 	input.close();
 }
 // Ham doc tai khoan Staff trong file
-vector<Account> readStaffAccountFile(vector<Account>& accounts) {
+void readStaffAccountFile(vector<Account>& staffAccounts) {
 	ifstream input("StaffAccount.txt");
 	if (input.is_open()) {
 		string username;
 		string password;
 		while (input >> username >> password) {
-			accounts.emplace_back(username, password);
+			staffAccounts.emplace_back(username, password);
 		}
 	}
 	input.close();
 }
 // Ham doc tai khoan Manager trong file
-vector<Account> readManagerAccountFile(vector<Account>& accounts) {
+void readManagerAccountFile(vector<Account>& managerAccounts) {
 	ifstream input("ManagerAccount.txt");
 	if (input.is_open()) {
 		string username;
 		string password;
 		while (input >> username >> password) {
-			accounts.emplace_back(username, password);
+			managerAccounts.emplace_back(username, password);
 		}
 	}
 	input.close();
@@ -824,12 +915,15 @@ void printSeal() {
 }
 // Ham main
 int main() {
+	int currentCustomerIndex = -1;
 	vector<Customer> customers;
-	vector<Account> accounts;
+	vector<Account> customerAccounts;
+	vector<Account> staffAccounts;
+	vector<Account> managerAccounts;
 	readCustomerFile(customers);
-	vector<Account> customerAccounts = readCustomerAccountFile(accounts);
-	vector<Account> staffAccounts = readStaffAccountFile(accounts);
-	vector<Account> managerAccounts = readManagerAccountFile(accounts);
+	readCustomerAccountFile(customerAccounts);
+	readStaffAccountFile(staffAccounts);
+	readManagerAccountFile(managerAccounts);
 	printSeal();
 	cout << fixed;
 	cout << setprecision(0);
@@ -863,7 +957,6 @@ int main() {
 		bool exitUserType = false;
 		while (!exitUserType) {
 			bool login = false;
-			int loginAttempts = 0;
 			if (!login) {
 				cout << "\nPlease select your option: " << endl;
 				cout << "[1]: Login" << endl;
@@ -875,52 +968,38 @@ int main() {
 			cin >> choice;
 			switch (choice) {
 				case 1:
-					login = loginAccount(accounts);
-					while (!login && loginAttempts < 3) {
-						if (userChoice == 1) {
-							if (loginAccount(customerAccounts)) {
-								cout << "\n--------------- Main menu for customer ---------------" << endl;
-								cout << "[1]: Show customer's information " << endl;
-								cout << "[2]: Print temporary card " << endl;
-								cout << "[0]: Exit " << endl;
-								login = true;
-							} else {
-								loginAttempts++;
-							}
+					if (userChoice == 1) {
+						if (loginCusAccount(customerAccounts, currentCustomerIndex)) {
+							login = true;
+							cout << "\n--------------- Main menu for customer ---------------" << endl;
+							cout << "[1]: Show customer's information " << endl;
+							cout << "[2]: Print temporary card " << endl;
+							cout << "[0]: Exit " << endl;
 						}
-						if (userChoice == 2) {
-							if (loginAccount(staffAccounts)) {
-								cout << "\n--------------- Main menu for staff ---------------" << endl;
-								cout << "[1]: Show the list of customers " << endl;
-								cout << "[2]: Add a new customer " << endl;
-								cout << "[3]: Delete a customer " << endl;
-								cout << "[4]: Delete the list " << endl;
-								cout << "[5]: Change customer's information " << endl;
-								cout << "[6]: Search for customers by categories " << endl;
-								cout << "[7]: Sort customers by categories " << endl;
-								cout << "[8]: Register customer account" << endl;
-								cout << "[9]: Delete customer account" << endl;
-								cout << "[0]: Exit " << endl;
-								login = true;
-							} else {
-								loginAttempts++;
-							}
+					}
+					if (userChoice == 2) {
+						if (loginStaffAccount(staffAccounts)) {
+							login = true;
+							cout << "\n--------------- Main menu for staff ---------------" << endl;
+							cout << "[1]: Show the list of customers " << endl;
+							cout << "[2]: Add a new customer " << endl;
+							cout << "[3]: Delete a customer " << endl;
+							cout << "[4]: Change customer's information " << endl;
+							cout << "[5]: Search for customers by categories " << endl;
+							cout << "[6]: Sort customers by categories " << endl;
+							cout << "[7]: Register customer account" << endl;
+							cout << "[8]: Show customer accounts" << endl;
+							cout << "[9]: Change account information " << endl;
+							cout << "[0]: Exit " << endl;
 						}
-						if (userChoice == 3) {
-							if (loginAccount(managerAccounts)) {
-								cout << "\n--------------- Main menu for manager ---------------" << endl;
-								cout << "[1]: Register staff account" << endl;
-								cout << "[2]: Delete staff account" << endl;
-								cout << "[0]: Exit" << endl;
-
-								login = true;
-							} else {
-								loginAttempts++;
-							}
-						}
-						if (loginAttempts >= 3) {
-							cout << "Too many login attempts. Exiting." << endl;
-							exitUserType = true;
+					}
+					if (userChoice == 3) {
+						if (loginManagerAccount(managerAccounts)) {
+							login = true;
+							cout << "\n--------------- Main menu for manager ---------------" << endl;
+							cout << "[1]: Register staff account" << endl;
+							cout << "[2]: Show staff accounts" << endl;
+							cout << "[0]: Exit" << endl;
 						}
 					}
 					break;
@@ -930,97 +1009,96 @@ int main() {
 				default:
 					cout << "Invalid choice." << endl;
 					break;
-					if (login) {
-						while (1) {
-							cout << "-------------------------------------" << endl;
-							cout << "Your choice (main menu): ";
-							int choice;
-							cin >> choice;
-							if (userChoice == 1) {
-								switch (choice) {
-									case 1:
-										check (customers, accounts);
-										break;
-									case 2:
-										tempCard (customers, accounts);
-										break;
-									case 0:
-										break;
-									default:
-										cout << "Invalid choice" << endl;
-										break;
-								}
-							}
-							if  (userChoice == 2) {
-								switch (choice) {
-									case 1:
-										list_customers(customers);
-										break;
-									case 2:
-										add_customer(customers);
-										saveCustomerToFile(customers);
-										break;
-									case 3:
-										delete_customer(customers);
-										saveCustomerToFile(customers);
-										break;
-									case 4:
-										delete_list(customers);
-										saveCustomerToFile(customers);
-										break;
-									case 5:
-										change_info_customer(customers);
-										saveCustomerToFile(customers);
-										break;
-									case 6:
-										search_all(customers);
-										break;
-									case 7:
-										sort_All(customers);
-										break;
-									case 8:
-										registerAccount(accounts);
-										saveCustomerAccountToFile(accounts);
-										break;
-									case 9:
-										deleteAccount(accounts);
-										saveCustomerAccountToFile(accounts);
-									case 0:
-										saveCustomerToFile(customers);
-										break;
-									default:
-										cout << "Invalid choice" << endl;
-										break;
-								}
-							}
-							if (userChoice == 3) {
-								switch (choice) {
-									case 1:
-										registerAccount(accounts);
-										saveStaffAccountToFile(accounts);
-										break;
-									case 2:
-										deleteAccount(accounts);
-										saveStaffAccountToFile(accounts);
-										break;
-									case 0:
-										break;
-									default:
-										cout << "Invalid choice" << endl;
-										break;
-								}
-							}
-							if (choice == 0) {
+			}
+			if (login) {
+				while (1) {
+					cout << "\n-------------------------------------" << endl;
+					cout << "Your choice (main menu): ";
+					int choice;
+					cin >> choice;
+					if (userChoice == 1) {
+						switch (choice) {
+							case 1:
+								check (customers, customerAccounts, currentCustomerIndex);
 								break;
-							}
+							case 2:
+								tempCard (customers, customerAccounts, currentCustomerIndex);
+								break;
+							case 0:
+								break;
+							default:
+								cout << "Invalid choice" << endl;
+								break;
 						}
 					}
-					if (exitUserType) {
+					if  (userChoice == 2) {
+						switch (choice) {
+							case 1:
+								list_customers(customers);
+								break;
+							case 2:
+								add_customer(customers);
+								saveCustomerToFile(customers);
+								break;
+							case 3:
+								delete_customer(customers);
+								saveCustomerToFile(customers);
+								break;
+							case 4:
+								change_info_customer(customers);
+								saveCustomerToFile(customers);
+								break;
+							case 5:
+								search_all(customers);
+								break;
+							case 6:
+								sort_All(customers);
+								break;
+							case 7:
+								registerCusAccount(customerAccounts);
+								saveCustomerAccountToFile(customerAccounts);
+								break;
+							case 8:
+								showCustomerAccounts(customerAccounts);
+								break;
+							case 9:
+								changeAccount(customerAccounts);
+								break;
+							case 0:
+								saveCustomerToFile(customers);
+								break;
+							default:
+								cout << "Invalid choice" << endl;
+								break;
+						}
+					}
+					if (userChoice == 3) {
+						switch (choice) {
+							case 1:
+								registerStaffAccount(staffAccounts);
+								saveStaffAccountToFile(staffAccounts);
+								break;
+							case 2:
+								showStaffAccounts(staffAccounts);
+								break;
+							case 0:
+								break;
+							default:
+								cout << "Invalid choice" << endl;
+								break;
+						}
+					}
+					if (choice == 0) {
 						break;
 					}
+				}
+			}
+			if (exitUserType) {
+				break;
 			}
 		}
 	}
 	return 0;
 }
+
 
