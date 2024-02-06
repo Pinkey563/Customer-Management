@@ -22,8 +22,8 @@ _ Run the code file to access the system. Following these steps to use it effect
   
   _ If the staff doesn't have an account, ask the manager to create a new one
   
-4. Choose a function you want from the main menu
-5. Exit the program
+3. Choose a function you want from the main menu
+4. Exit the program
 
 _ After you have done any of the functions, the data will automatically be saved into the corresponding files
 
