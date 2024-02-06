@@ -18,9 +18,9 @@ _ Run the code file to access the system. Following these steps to use it effect
 1. Choose the user type
 2. Login/ Register an account
    
-  _ If the customer doesn't have an account, ask the staff to create a new one
+        _ If the customer doesn't have an account, ask the staff to create a new one
   
-  _ If the staff doesn't have an account, ask the manager to create a new one
+        _ If the staff doesn't have an account, ask the manager to create a new one
   
 3. Choose a function you want from the main menu
 4. Exit the program
