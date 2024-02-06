@@ -5,6 +5,15 @@ _This is a simple customer management system used for any shop, store,...
 
 _This system consists of various functions for different user types.
 
+## Included files
+_ Customer.txt: File contains the customer's information
+
+_ Customer/Staff/ManagerAccount.txt: Files contain the user account(username, password)
+
+_ Seal.txt: File contains an image for decoration
+
+_ ktlt.cpp: File contains the code
+
 ## Requirement
 _ C++ compiler ( DevC++, Visual Code Studio, ...)
 
