@@ -21,6 +21,7 @@ _ Run the code file to access the system. Following these steps to use it effect
   _ If the customer doesn't have an account, ask the staff to create a new one
   
   _ If the staff doesn't have an account, ask the manager to create a new one
+  
 4. Choose a function you want from the main menu
 5. Exit the program
 
